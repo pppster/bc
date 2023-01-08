@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 
 from functions.functions import *
 
-models_paths = sorted(glob('.\cnn\model*'))
-history_paths = sorted(glob('.\cnn\*.json'))
+models_paths = sorted(glob('.\models\model*'))
+history_paths = sorted(glob('.\models\*.json'))
 class_types = ['label_damaged', 'bottle_damaged', 'open_closed']
 image_types = [MASK, IMAGE, NOBACKGROUND]
 
@@ -24,7 +24,7 @@ for class_type in class_types[:]:
             history = json.load(f)
         model = tf.keras.models.load_model(model_path)
 
-        img_dir = f'images\_{class_type}\*\*'
+        img_dir = f'..\images\_{class_type}\*\*'
         images, labels = load_images_and_labels(image_dir=img_dir, image_type=image_type)
         labels = get_one_hot_encoding(labels)
 

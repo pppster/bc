@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.model_selection import train_test_split
 from functions.functions import *
 from scipy.stats import norm
@@ -13,20 +12,15 @@ def percentage(data: np.array):
     return data / data.sum()
 
 
-# fit a probability distribution to a univariate data sample
 def fit_distribution(data):
-    # estimate parameters
     mu = mean(data)
     sigma = std(data)
-    # fit distribution
     dist = norm(mu, sigma)
     return dist
 
 
-# calculate the independent conditional probability
 def get_probabilities(sample: np.array, priories, distributions):
     probabilities = []
-    n_classes = len(priories)
     n_features = len(sample)
     probs = []
     for c in distributions:
@@ -58,7 +52,6 @@ def get_distributions(labels, samples: np.array):
     classes = np.unique(labels)
     for c in classes:
         samples_in_class = samples[labels == c]
-        feature_counter = 1
         key = f'dists_{c}'
         distributions = []
         for feature in samples_in_class.T:
@@ -69,7 +62,7 @@ def get_distributions(labels, samples: np.array):
     return feature_distributions
 
 
-def train(labels_train: np.array, samples_train: np.array):
+def fit_naivebayes(labels_train: np.array, samples_train: np.array):
     priories = get_priory_prob(labels=labels_train, samples=samples_train)
     distributions = get_distributions(labels=labels_train, samples=samples_train)
     return priories, distributions
@@ -84,7 +77,7 @@ samples_train, samples_test, labels_train, labels_test = train_test_split(sample
                                                                           random_state=42,
                                                                           shuffle=True)
 
-priories, distributions = train(labels_train=labels_train, samples_train=samples_train)
+priories, distributions = fit_naivebayes(labels_train=labels_train, samples_train=samples_train)
 labels_pred = []
 for sample in samples_test:
     probabilities = get_probabilities(sample=sample, priories=priories, distributions=distributions)

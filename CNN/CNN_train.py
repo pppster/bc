@@ -23,7 +23,7 @@ for image_type in image_types:
     for class_type in class_types:
         i = str(image_type)[str(image_type).find('.')+1:]
 
-        img_dir = f'images\_{class_type}\*\*'
+        img_dir = f'..\images\_{class_type}\*\*'
         image_paths = just_image_names(img_dir)
         images = []
         labels = []
@@ -40,12 +40,9 @@ for image_type in image_types:
 
         label_encoder = LabelEncoder()
         integer_encoded = label_encoder.fit_transform(labels)
-        print(integer_encoded)
-        # binary encode
         onehot_encoder = OneHotEncoder(sparse_output=False)
         integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
         labels = onehot_encoder.fit_transform(integer_encoded)
-        print(labels.shape)
         num_categories = labels.shape[1]
 
         print(f'Labels: {labels.shape} --- Images: {images.shape}')

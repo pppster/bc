@@ -55,12 +55,3 @@ for dataframe in dataframes:
     plt.subplot(122)
     show_confusion_matrix(confusion_matrix=confmat_builtin, title=confmat_title_builtin)
     plt.show()
-
-
-
-
-
-    # print(f'samples_train: {samples_train.shape}\n'
-    #       f'samples_test: {samples_test.shape}\n'
-    #       f'labels_train: {labels_train.shape}\n'
-    #       f'labels_test: {labels_test.shape}')
