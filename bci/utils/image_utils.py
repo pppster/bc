@@ -6,5 +6,7 @@ def just_image_names(dir: str) -> list:
     filtered = [file for file in filtered if "nobackground" not in file]
     return sorted(filtered)
 
+
+
 if __name__ == '__main__':
     print('Just bcimage util functions')

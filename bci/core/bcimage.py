@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy import ndimage
 from rembg import remove
 from bci.utils.bcimageenum import BCImageEnum, MASK, IMAGE, NOBACKGROUND
 from bci.utils.image_utils import just_image_names
@@ -57,12 +58,12 @@ class BCImage:
             assert False, "There is no such BCImageType"
 
     def get_name(self) -> str:
-        start, end = self.image_path.rfind('/'), self.image_path.rfind('.')
+        start, end = self.image_path.rfind('\\'), self.image_path.rfind('.')
         name = self.image_path[start+1:end]
         return name
 
     def get_label(self) -> str:
-        return self.image_path.split('/')[-2]
+        return self.image_path.split('\\')[-2]
 
     def get_filename_mask(self) -> str:
         index_datatype = self.image_path.rfind('.')
@@ -94,7 +95,7 @@ class BCImage:
 
     def rename_image(self, new_name):
         old_name = self.image_path
-        start, end = old_name.rfind('/') + 1, old_name.rfind('.')
+        start, end = old_name.rfind('\\') + 1, old_name.rfind('.')
         updated_filename = old_name[:start] + new_name + old_name[end:]
         os.rename(self.image_path, updated_filename)
         self.path = updated_filename
@@ -150,8 +151,6 @@ class BCImage:
 
 
 
-
-
 def preprocess_images_in_directory(path: str, height: int = 300, aspect_ratio: float = 0.75):
     image_paths = just_image_names(path)
 
@@ -175,6 +174,8 @@ def preprocess_images_in_directory(path: str, height: int = 300, aspect_ratio: f
 
 if __name__ == '__main__':
     print('Just bcimage class')
+    path = './../../images/_bottle_damaged/damaged/damaged_00000.jpeg'
+
 
 
 

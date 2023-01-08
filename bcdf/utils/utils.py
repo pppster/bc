@@ -21,8 +21,8 @@ def just_image_names(dir: str) -> list:
 def _create_labeled_dataframe(dir: list) -> pd.DataFrame:
     dataframe = pd.DataFrame(columns=['Name', 'Label'])
     for path in dir:
-        label = path.split('/')[-2]
-        filename = path.split('/')[-1]
+        label = path.split('\\')[-2]
+        filename = path.split('\\')[-1]
         name = filename[:filename.rfind('.')]
         if not any(dataframe['Name'] == name):
             dataframe.loc[len(dataframe)] = [name, label]

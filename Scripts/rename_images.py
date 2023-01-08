@@ -7,12 +7,12 @@ def get_datatype(path: str):
 
 
 def change_filename(old: str, new: str):
-    start, end = old.rfind('/')+1, old.rfind('.')
+    start, end = old.rfind('\\')+1, old.rfind('.')
     updated_filename = old[:start] + new + old[end:]
     return updated_filename
 
 def get_filename(image_path: str) -> str:
-    start, end = image_path.rfind('/') + 1, image_path.rfind('.')
+    start, end = image_path.rfind('\\') + 1, image_path.rfind('.')
     return image_path[start:end]
 
 def get_last_image(images: list, label: str) -> int:
@@ -29,8 +29,7 @@ def get_last_image(images: list, label: str) -> int:
     return last_image
 
 if __name__ == '__main__':
-    ABSOLUTE_PATH = os.path.dirname(__file__)
-    CLASSIFICATION_PATH = os.path.join(ABSOLUTE_PATH,'images','*')
+    CLASSIFICATION_PATH = '../images/*'
     classifications = glob(CLASSIFICATION_PATH)
     for classification in classifications:
         labels = os.listdir(classification)
@@ -43,7 +42,7 @@ if __name__ == '__main__':
                     changed_filename = change_filename(image, new_filename)
                     print(image)
                     print(changed_filename)
-                    os.rename(image, changed_filename)
+                    # os.rename(image, changed_filename)
                     image_counter += 1
 
 
