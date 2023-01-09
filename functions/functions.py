@@ -1,7 +1,9 @@
 import csv
+from scipy.stats import norm
+from numpy import mean
+from numpy import std
 import pandas as pd
 import numpy as np
-from numpy.linalg.linalg import norm
 import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix
@@ -33,7 +35,7 @@ def knn_predict(k: int, samples_test: np.array, samples_train: np.array, labels_
     for sample in samples_test:
         distance_and_label = []
         for i in range(len(samples_train)):
-            distance = norm(samples_train[i] - sample)
+            distance = np.linalg.linalg.norm(samples_train[i] - sample)
             label = labels_train[i]
             distance_and_label.append((distance, label))
         distance_and_label = np.array(distance_and_label)
@@ -111,6 +113,70 @@ def train_nb(x_train, y_train):
     mean = df_train.groupby('Label').mean()
     variance = df_train.groupby('Label').var(ddof=0)
     return n_features, categories, n_samples_pro_category, mean, variance
+
+
+def normalize(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
+
+
+def percentage(data: np.array):
+    return data / data.sum()
+
+
+def fit_distribution(data):
+    mu = mean(data)
+    sigma = std(data)
+    dist = norm(mu, sigma)
+    return dist
+
+
+def get_probabilities(sample: np.array, priories, distributions):
+    probabilities = []
+    n_features = len(sample)
+    probs = []
+    for c in distributions:
+        dists = distributions[c]
+        feature_probs = []
+        for i in range(n_features):
+            feature_prob = dists[i].pdf(sample[i])
+            feature_probs.append(feature_prob)
+        probs.append(np.prod(feature_probs))
+    for i in range(len(probs)):
+        probabilities.append(priories[i]*probs[i])
+    return percentage(np.array(probabilities))
+
+
+def get_priory_prob(labels, samples):
+    priory_probs = []
+    classes = np.unique(labels)
+    for c in classes:
+        samples_in_class = samples[labels == c]
+        priory_prob = len(samples_in_class) / len(labels)
+        priory_probs.append(priory_prob)
+
+    priory_probs = np.array(priory_probs)
+    return priory_probs
+
+
+def get_distributions(labels, samples: np.array):
+    feature_distributions = {}
+    classes = np.unique(labels)
+    for c in classes:
+        samples_in_class = samples[labels == c]
+        key = f'dists_{c}'
+        distributions = []
+        for feature in samples_in_class.T:
+            distribution = fit_distribution(feature)
+            distributions.append(distribution)
+        distributions = np.array(distributions)
+        feature_distributions[key] = distributions
+    return feature_distributions
+
+
+def fit_naivebayes(labels_train: np.array, samples_train: np.array):
+    priories = get_priory_prob(labels=labels_train, samples=samples_train)
+    distributions = get_distributions(labels=labels_train, samples=samples_train)
+    return priories, distributions
 
 
 if __name__ == '__main__':
