@@ -61,7 +61,7 @@ for dataframe in dataframes:
                'Recall': (recall, recall_builtin),
                'F1-Score': (f1, f1_builtin)}
 
-    # print metrics to console
+    #print metrics to console
     print_metrics(metrics=metrics)
 
     # calculate confusion matrices for visualization tasks

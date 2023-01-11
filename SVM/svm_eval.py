@@ -1,6 +1,72 @@
+from sklearn import datasets
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 from functions.functions import *
-from sklearn.naive_bayes import GaussianNB
+
+import numpy as np
+
+from functions.functions import read_csv_as_np, get_labels_and_samples
+
+
+class SVM:
+
+    def __init__(self, C=1.0):
+        # C = error term
+        self.C = C
+        self.w = 0
+        self.b = 0
+
+    # Hinge Loss Function / Calculation
+    def hingeloss(self, w, b, x, y):
+        # Regularizer term
+        reg = 0.5 * (w * w)
+
+        for i in range(x.shape[0]):
+            # Optimization term
+            opt_term = y[i] * ((np.dot(w, x[i])) + b)
+
+            # calculating loss
+            loss = reg + self.C * max(0, 1 - opt_term)
+        return loss[0][0]
+
+    def fit(self, X, Y, batch_size=200, learning_rate=0.01, epochs=500):
+        n_samples, n_features = X.shape
+        c = self.C
+        idx = np.arange(n_samples)
+        np.random.shuffle(idx)
+        w = np.zeros((1, n_features))
+        b = 0
+        losses = []
+        for i in range(epochs):
+            l = self.hingeloss(w, b, X, Y)
+            losses.append(l)
+            for batch in range(0, n_samples, batch_size):
+                gradient_w = 0
+                gradient_b = 0
+                for j in range(batch, batch + batch_size):
+                    if j < n_samples:
+                        x = idx[j]
+                        ti = Y[x] * (np.dot(w, X[x].T) + b)
+                        if ti > 1:
+                            gradient_w += 0
+                            gradient_b += 0
+                        else:
+                            gradient_w += c * Y[x] * X[x]
+                            gradient_b += c * Y[x]
+                w = w - learning_rate * w + learning_rate * gradient_w
+                b = b + learning_rate * gradient_b
+        self.w = w
+        self.b = b
+
+        return self.w, self.b, losses
+
+    def predict(self, X):
+
+        prediction = np.dot(X, self.w[0]) + self.b  # w.x + b
+        return np.sign(prediction)
 
 # Paths to dataframes
 path_df_bottle_damaged = '../dataframes/_bottle_damaged/dataframe.csv'
@@ -21,6 +87,7 @@ for dataframe in dataframes:
     print(dataframe)
     # split the data into labels and samples
     labels, samples = get_labels_and_samples(dataframes[dataframe])
+    labels = np.where(labels == 1, 1, -1)
 
     # split data into training and test data
     samples_train, samples_test, labels_train, labels_test = train_test_split(samples,
@@ -29,28 +96,19 @@ for dataframe in dataframes:
                                                                               random_state=42,
                                                                               shuffle=True)
 
-    # setup built-in GNB
-    model = GaussianNB()
-    model.fit(X=samples_train, y=labels_train)
-    labels_pred_builtin = model.predict(samples_test)
+    svm_own = SVM()
+    svm_builtin = SVC()
 
-    # fit self-built GNB
-    priories, distributions = fit_naivebayes(labels_train=labels_train, samples_train=samples_train)
+    w, b, losses = svm_own.fit(samples_train, labels_train)
+    svm_builtin.fit(samples_train, labels_train)
 
-    # predict with self-built GNB
-    labels_pred_own = []
-    for sample in samples_test:
-        probabilities = get_probabilities(sample=sample, priories=priories, distributions=distributions)
-        labels_pred_own.append(probabilities)
+    labels_pred_own = svm_own.predict(samples_test)
+    labels_pred_builtin = svm_builtin.predict(samples_test)
 
-    # encode labels for comparison
-    labels_pred_own = np.round(np.array(labels_pred_own))
-    labels_pred_own = np.argmax(labels_pred_own, axis=1) + 1
-    labels_test = get_one_hot_encoding(labels_test)
-    labels_test = np.argmax(labels_test, axis=1) + 1
+    labels_pred_builtin = np.where(labels_pred_builtin == 1, 1, 2)
+    labels_pred_own = np.where(labels_pred_own == 1, 1, 2)
+    labels_test = np.where(labels_test == 1, 1, 2)
 
-    # calculate true pos, true-neg, false-pos and false-neg for metric calculation
-    # for self-built and build-in GNB
     tp, tn, fp, fn = get_TP_TN_FP_FN(labels_pred_own, labels_test)
     tp_builtin, tn_builtin, fp_builtin, fn_builtin = get_TP_TN_FP_FN(labels_pred_builtin, labels_test)
 
@@ -72,10 +130,10 @@ for dataframe in dataframes:
     # calculate confusion matrices for visualization tasks
     confmat_own = confusion_matrix(labels_test, labels_pred_own)
     confmat_builtin = confusion_matrix(labels_test, labels_pred_builtin)
-    confmat_title_own = f'Confusion Matrix for {dataframe} for own GNB'
-    confmat_title_builtin = f'Confusion Matrix for {dataframe} for built-in GNB'
+    confmat_title_own = f'Confusion Matrix for {dataframe} for own SVM'
+    confmat_title_builtin = f'Confusion Matrix for {dataframe} for built-in SVM'
 
-    # plot confusion matrices for comparison between self-built and built-in GNB
+    # plot confusion matrices for comparison between self-built and built-in SVM
     plt.subplot(121)
     show_confusion_matrix(confusion_matrix=confmat_own, title=confmat_title_own)
     plt.subplot(122)

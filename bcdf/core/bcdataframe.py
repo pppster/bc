@@ -53,7 +53,10 @@ class BCDataframe:
         self.dataframe = encoder.fit_transform(self.dataframe)
 
     def show_scatter_matrix(self):
-        pd.plotting.scatter_matrix(self.dataframe.iloc[:, 1:-1], c=self.dataframe.Label)
+        axes = pd.plotting.scatter_matrix(self.dataframe.iloc[:, 1:-1], c=self.dataframe.Label)
+        for ax in axes.flatten():
+            ax.yaxis.label.set_rotation(0)
+            ax.yaxis.label.set_ha('right')
         plt.show()
 
 

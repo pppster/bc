@@ -2,7 +2,6 @@ import csv
 from scipy.stats import norm
 from numpy import mean
 from numpy import std
-import pandas as pd
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
