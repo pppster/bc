@@ -46,7 +46,7 @@ for class_type in class_types[:]:
         images_train, images_test, labels_train, labels_test = train_test_split(images, labels, test_size=0.2, random_state=42, shuffle=True)
 
         # predict labels
-        labels_pred = model.predict_svm(images_test)
+        labels_pred = model.predict(images_test)
 
         # decode one hot encoding for predicted labels and true labels
         labels_pred = np.round(labels_pred)

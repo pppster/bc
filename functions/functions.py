@@ -17,6 +17,12 @@ def read_csv_as_np(path):
     data = np.array(data)
     return data
 
+def scale(X, x_min=0, x_max=1):
+    nom = (X-X.min(axis=0))*(x_max-x_min)
+    denom = X.max(axis=0) - X.min(axis=0)
+    denom[denom==0] = 1
+    return x_min + nom/denom
+
 def get_labels_and_samples(data: np.array):
     labels = np.array(data[1:, -1], dtype=int)
     samples = np.array(data[1:, 1:-1], dtype=float)
@@ -49,7 +55,10 @@ def knn_predict(k: int, samples_test: np.array, samples_train: np.array, labels_
         else:
             print('Beide Klassen möglich')
     labels_pred = np.array(labels_pred)
-    return labels_pred
+    return labels_pred[0]
+
+
+
 
 def get_acc_precision_recall_f1(tp: float, tn: float, fp: float, fn: float):
     acc = (tp+tn)/(tp+tn+fp+fn)

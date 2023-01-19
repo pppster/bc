@@ -78,7 +78,6 @@ class BCDataframe:
 
         new_row = pd.DataFrame([new_row])
         test_dataframe = pd.concat([test_dataframe, new_row], ignore_index=True)
-        print(test_dataframe.head())
         return test_dataframe
 
     def normalize(self):
